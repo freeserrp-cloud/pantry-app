@@ -1,0 +1,17 @@
+# Frontend
+node_modules/
+dist/
+.angular/
+
+# Backend
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.sqlite3
+*.db
+pantry.db
+
+# OS
+.DS_Store

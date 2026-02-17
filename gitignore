@@ -1,0 +1,25 @@
+# ======================
+# GLOBAL IGNORE
+# ======================
+
+# macOS
+.DS_Store
+
+# Node
+node_modules
+dist
+
+# Python
+.venv
+__pycache__
+*.pyc
+
+# Env files
+.env
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log

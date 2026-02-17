@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=sqlite:///./pantry.db
+      - HOUSEHOLD_ID=00000000-0000-0000-0000-000000000001

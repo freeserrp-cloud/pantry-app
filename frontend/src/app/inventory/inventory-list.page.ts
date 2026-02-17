@@ -1,0 +1,123 @@
+import { Component, OnInit, inject, signal } from "@angular/core";
+import { NgFor, NgIf } from "@angular/common";
+import { Router, RouterLink } from "@angular/router";
+
+import { InventoryStore } from "./inventory.store";
+import { BarcodeScannerComponent } from "../shared/barcode-scanner.component";
+import { ProductLookupResult } from "../shared/product-lookup.service";
+
+@Component({
+  selector: "app-inventory-list",
+  standalone: true,
+  imports: [NgIf, NgFor, RouterLink, BarcodeScannerComponent],
+  template: `
+    <section class="inventory-header">
+      <div>
+        <h1>Inventory</h1>
+        <p class="hint">Tap + / - to update quickly.</p>
+      </div>
+      <div class="actions">
+        <button class="secondary" (click)="openScanner()">Scan Product</button>
+        <a class="primary" routerLink="/items/new">Add Item</a>
+      </div>
+    </section>
+
+    <section *ngIf="store.error()" class="error">{{ store.error() }}</section>
+
+    <section *ngIf="store.loading()" class="loading">Loading...</section>
+
+    <section *ngIf="!store.loading() && store.items().length === 0" class="empty">
+      <div class="empty-card">
+        <h2>No items yet</h2>
+        <p>Add your first pantry item to get started.</p>
+        <a class="primary" routerLink="/items/new">Add Item</a>
+      </div>
+    </section>
+
+    <section class="inventory-list" *ngIf="store.items().length">
+      <article
+        class="item-card"
+        *ngFor="let item of store.items(); trackBy: trackById"
+        [class.low]="isLow(item.quantity, item.min_quantity)"
+      >
+        <div class="item-main">
+          <div>
+            <div class="item-name">{{ item.name }}</div>
+            <div class="item-meta">
+              <span *ngIf="item.category">{{ item.category }}</span>
+              <span *ngIf="item.min_quantity > 0">Min {{ item.min_quantity }}</span>
+            </div>
+          </div>
+          <div class="quantity" [attr.aria-label]="'Quantity ' + item.quantity">
+            {{ item.quantity }}
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="qty-btn" (click)="store.decrement(item.id)" aria-label="Decrease quantity">-</button>
+          <button class="qty-btn" (click)="store.increment(item.id)" aria-label="Increase quantity">+</button>
+        </div>
+        <div class="item-links">
+          <a routerLink="/items/{{ item.id }}">Edit</a>
+          <button class="ghost" (click)="store.deleteItem(item.id)">Delete</button>
+        </div>
+      </article>
+    </section>
+
+    <div class="scanner-overlay" *ngIf="showScanner()">
+      <div class="scanner-modal">
+        <app-barcode-scanner
+          (detected)="onDetected($event)"
+          (error)="onScannerError($event)"
+        />
+        <div class="scanner-error-banner" *ngIf="scannerError()">
+          {{ scannerError() }}
+        </div>
+        <button class="scanner-cancel" (click)="closeScanner()">Cancel</button>
+      </div>
+    </div>
+  `,
+  styleUrls: ["./inventory-list.page.css"]
+})
+export class InventoryListPage implements OnInit {
+  store = inject(InventoryStore);
+  private router = inject(Router);
+  showScanner = signal(false);
+  scannerError = signal<string | null>(null);
+
+  ngOnInit() {
+    this.store.loadItems();
+  }
+
+  trackById(_: number, item: { id: string }) {
+    return item.id;
+  }
+
+  isLow(quantity: number, min: number) {
+    return quantity <= min;
+  }
+
+  openScanner() {
+    this.scannerError.set(null);
+    this.showScanner.set(true);
+  }
+
+  closeScanner() {
+    this.showScanner.set(false);
+  }
+
+  onDetected(payload: ProductLookupResult | { barcode: string }) {
+    this.showScanner.set(false);
+    const queryParams: Record<string, string> = { barcode: payload.barcode };
+    if ("name" in payload && payload.name) {
+      queryParams["name"] = payload.name;
+    }
+    if ("imageUrl" in payload && payload.imageUrl) {
+      queryParams["imageUrl"] = payload.imageUrl;
+    }
+    this.router.navigate(["/items/new"], { queryParams });
+  }
+
+  onScannerError(message: string) {
+    this.scannerError.set(message);
+  }
+}
