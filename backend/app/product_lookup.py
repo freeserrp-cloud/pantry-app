@@ -1,26 +1,42 @@
 import requests
 
-OFF = "https://world.openfoodfacts.org/api/v0/product/"
-
 def lookup_product(barcode: str):
     try:
-        r = requests.get(f"{OFF}{barcode}.json", timeout=5)
-        data = r.json()
+        url = f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
+        res = requests.get(url, timeout=5)
 
-        if data.get("status") == 1:
-            product = data.get("product", {})
-            return {
-                "name": product.get("product_name"),
-                "image": product.get("image_front_url"),
-                "brand": product.get("brands"),
-                "found": True,
-            }
-    except Exception as e:
-        print("Lookup error:", e)
+        if res.status_code != 200:
+            raise Exception("OFF request failed")
 
-    return {
-        "name": f"Produkt {barcode}",
-        "image": None,
-        "brand": None,
-        "found": False,
-    }
+        data = res.json()
+        product = data.get("product")
+
+        if not product:
+            raise Exception("No product")
+
+        name = (
+            product.get("product_name")
+            or product.get("product_name_en")
+            or product.get("generic_name")
+        )
+
+        image = product.get("image_front_url")
+        brand = product.get("brands")
+
+        if not name:
+            raise Exception("No name")
+
+        return {
+            "name": name,
+            "image": image,
+            "brand": brand,
+            "found": True
+        }
+
+    except Exception:
+        return {
+            "name": f"Produkt {barcode}",
+            "image": None,
+            "brand": None,
+            "found": False
+        }
