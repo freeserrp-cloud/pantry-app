@@ -42,6 +42,9 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
   });
   private stream: MediaStream | null = null;
   private active = false;
+  private lastCandidate: string | null = null;
+  private stableReadCount = 0;
+  private readonly requiredStableReads = 2;
 
   ngAfterViewInit() {
     void this.start();
@@ -83,14 +86,29 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
           if (result) {
             const text = typeof result.getText === "function" ? result.getText() : null;
             if (text) {
-              this.detected.emit(text);
-              this.stop();
+              const candidate = this.extractBarcodeCandidate(text);
+              if (!candidate) {
+                this.resetStableRead();
+                return;
+              }
+
+              if (candidate === this.lastCandidate) {
+                this.stableReadCount += 1;
+              } else {
+                this.lastCandidate = candidate;
+                this.stableReadCount = 1;
+              }
+
+              if (this.stableReadCount >= this.requiredStableReads) {
+                this.detected.emit(candidate);
+                this.stop();
+              }
             }
             return;
           }
 
           const error = err as { name?: string } | null;
-          if (error?.name === "NotFoundException") {
+          if (this.isTransientDecodeError(error?.name)) {
             return;
           }
 
@@ -133,5 +151,63 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
 
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = null;
+    this.resetStableRead();
+  }
+
+  private resetStableRead() {
+    this.lastCandidate = null;
+    this.stableReadCount = 0;
+  }
+
+  private isTransientDecodeError(name?: string) {
+    return (
+      name === "NotFoundException"
+      || name === "ChecksumException"
+      || name === "FormatException"
+    );
+  }
+
+  private extractBarcodeCandidate(value: string) {
+    const raw = value.trim();
+    if (!raw) {
+      return null;
+    }
+
+    const digitsOnly = raw.replace(/\D/g, "");
+    const fromAi01 = this.extractAi01(digitsOnly);
+    const base = fromAi01 ?? digitsOnly;
+    if (!base) {
+      return null;
+    }
+
+    let normalized = base;
+    if (normalized.length === 14 && normalized.startsWith("0")) {
+      normalized = normalized.slice(1);
+    }
+    if (normalized.length === 13 && normalized.startsWith("0")) {
+      normalized = normalized.slice(1);
+    }
+
+    if (normalized.length === 8 || normalized.length === 12 || normalized.length === 13) {
+      return normalized;
+    }
+    return null;
+  }
+
+  private extractAi01(input: string) {
+    if (!input) {
+      return null;
+    }
+    const aiMarker = "01";
+    const index = input.indexOf(aiMarker);
+    if (index === -1) {
+      return null;
+    }
+    const start = index + aiMarker.length;
+    const end = start + 14;
+    if (input.length < end) {
+      return null;
+    }
+    return input.slice(start, end);
   }
 }
