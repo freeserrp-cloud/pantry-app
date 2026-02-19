@@ -1,9 +1,6 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild, inject } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from "@angular/core";
 import { NgIf } from "@angular/common";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-import { finalize } from "rxjs";
-
-import { ProductLookupService, ProductLookupResult } from "./product-lookup.service";
 
 @Component({
   selector: "app-barcode-scanner",
@@ -14,7 +11,6 @@ import { ProductLookupService, ProductLookupResult } from "./product-lookup.serv
       <video #video class="scanner-video" playsinline muted></video>
       <div class="scanner-frame"></div>
       <p class="scanner-hint">Align the barcode inside the frame</p>
-      <p class="scanner-loading" *ngIf="loading">Looking up product...</p>
       <p class="scanner-error" *ngIf="errorMessage">{{ errorMessage }}</p>
     </div>
   `,
@@ -23,19 +19,16 @@ import { ProductLookupService, ProductLookupResult } from "./product-lookup.serv
 export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
   @ViewChild("video", { static: true }) video!: ElementRef<HTMLVideoElement>;
 
-  @Output() detected = new EventEmitter<ProductLookupResult | { barcode: string }>();
+  @Output() detected = new EventEmitter<{ barcode: string }>();
   @Output() error = new EventEmitter<string>();
 
   errorMessage: string | null = null;
-  loading = false;
-
-  private lookup = inject(ProductLookupService);
-
-  private reader: BrowserMultiFormatReader | null = null;
+  private reader = new BrowserMultiFormatReader() as BrowserMultiFormatReader & { reset: () => void };
+  private stream: MediaStream | null = null;
   private active = false;
 
   ngAfterViewInit() {
-    this.start();
+    void this.start();
   }
 
   ngOnDestroy() {
@@ -43,13 +36,28 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
   }
 
   private async start() {
+    if (this.active) {
+      return;
+    }
     this.active = true;
-    this.reader = new BrowserMultiFormatReader();
 
     try {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment",
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      });
+      const videoEl = this.video.nativeElement;
+      videoEl.srcObject = this.stream;
+      await videoEl.play();
+      const track = this.stream.getVideoTracks()[0];
+      const deviceId = track?.getSettings().deviceId;
+
       await this.reader.decodeFromVideoDevice(
-        undefined,
-        this.video.nativeElement,
+        deviceId,
+        videoEl,
         (result: any, err: unknown) => {
           if (!this.active) {
             return;
@@ -58,7 +66,8 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
           if (result) {
             const text = typeof result.getText === "function" ? result.getText() : null;
             if (text) {
-              this.lookupProduct(text);
+              this.detected.emit({ barcode: text });
+              this.stop();
             }
             return;
           }
@@ -92,44 +101,16 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
     this.error.emit(message);
   }
 
-  private lookupProduct(barcode: string) {
-    if (!this.active || this.loading) {
-      return;
-    }
-    this.loading = true;
-    this.lookup
-      .lookup(barcode)
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (result) => {
-          if (!this.active) {
-            return;
-          }
-          if (result) {
-            this.detected.emit(result);
-          } else {
-            this.detected.emit({ barcode });
-          }
-          this.stop();
-        },
-        error: () => {
-          if (!this.active) {
-            return;
-          }
-          this.detected.emit({ barcode });
-          this.stop();
-        }
-      });
-  }
-
   private stop() {
     this.active = false;
+    this.reader.reset();
     const videoEl = this.video?.nativeElement;
-    const stream = videoEl?.srcObject as MediaStream | null;
-    stream?.getTracks().forEach((track) => track.stop());
+    const videoStream = videoEl?.srcObject as MediaStream | null;
+    videoStream?.getTracks().forEach((track) => track.stop());
+    this.stream?.getTracks().forEach((track) => track.stop());
+    this.stream = null;
     if (videoEl) {
       videoEl.srcObject = null;
     }
-    this.reader = null;
   }
 }

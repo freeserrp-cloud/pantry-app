@@ -1,10 +1,10 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { NgFor, NgIf } from "@angular/common";
-import { Router, RouterLink } from "@angular/router";
+import { RouterLink } from "@angular/router";
 
 import { InventoryStore } from "./inventory.store";
 import { BarcodeScannerComponent } from "../shared/barcode-scanner.component";
-import { ProductLookupResult } from "../shared/product-lookup.service";
+import { environment } from "../../environments/environment";
 
 @Component({
   selector: "app-inventory-list",
@@ -80,7 +80,6 @@ import { ProductLookupResult } from "../shared/product-lookup.service";
 })
 export class InventoryListPage implements OnInit {
   store = inject(InventoryStore);
-  private router = inject(Router);
   showScanner = signal(false);
   scannerError = signal<string | null>(null);
 
@@ -105,19 +104,66 @@ export class InventoryListPage implements OnInit {
     this.showScanner.set(false);
   }
 
-  onDetected(payload: ProductLookupResult | { barcode: string }) {
+  onDetected(payload: { barcode: string }) {
     this.showScanner.set(false);
-    const queryParams: Record<string, string> = { barcode: payload.barcode };
-    if ("name" in payload && payload.name) {
-      queryParams["name"] = payload.name;
-    }
-    if ("imageUrl" in payload && payload.imageUrl) {
-      queryParams["imageUrl"] = payload.imageUrl;
-    }
-    this.router.navigate(["/items/new"], { queryParams });
+    void this.addItem(payload.barcode);
   }
 
   onScannerError(message: string) {
     this.scannerError.set(message);
+  }
+
+  private async addItem(barcode: string) {
+    const fallbackName = `Produkt ${barcode}`;
+    const item = {
+      name: fallbackName,
+      quantity: 1
+    };
+
+    try {
+      const response = await fetch(`${environment.apiUrl}/items`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(item)
+      });
+      if (!response.ok) {
+        throw new Error("Save failed");
+      }
+
+      const saved = (await response.json()) as { id?: string };
+      this.store.loadItems();
+
+      if (saved.id) {
+        void this.lookupProductName(barcode, saved.id);
+      }
+    } catch (e) {
+      console.error("Save failed", e);
+    }
+  }
+
+  private async lookupProductName(barcode: string, itemId: string) {
+    try {
+      const res = await fetch(`${environment.apiUrl}/products/lookup/${encodeURIComponent(barcode)}`);
+      if (!res.ok) {
+        return;
+      }
+      const data = await res.json();
+      if (data?.found && typeof data?.name === "string" && data.name.trim()) {
+        await this.updateItemName(itemId, data.name.trim());
+      }
+    } catch {
+      // Ignore lookup failures.
+    }
+  }
+
+  private async updateItemName(itemId: string, name: string) {
+    const response = await fetch(`${environment.apiUrl}/items/${encodeURIComponent(itemId)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    });
+    if (response.ok) {
+      this.store.loadItems();
+    }
   }
 }
