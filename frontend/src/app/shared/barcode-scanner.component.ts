@@ -86,7 +86,8 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
           if (result) {
             const text = typeof result.getText === "function" ? result.getText() : null;
             if (text) {
-              const candidate = this.extractBarcodeCandidate(text);
+              const format = typeof result.getBarcodeFormat === "function" ? (result.getBarcodeFormat() as BarcodeFormat) : null;
+              const candidate = this.extractBarcodeCandidate(text, format);
               if (!candidate) {
                 this.resetStableRead();
                 return;
@@ -167,7 +168,7 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
     );
   }
 
-  private extractBarcodeCandidate(value: string) {
+  private extractBarcodeCandidate(value: string, format: BarcodeFormat | null) {
     const raw = value.trim();
     if (!raw) {
       return null;
@@ -175,6 +176,10 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
 
     const digitsOnly = raw.replace(/\D/g, "");
     const fromAi01 = this.extractAi01(digitsOnly);
+    if (format === BarcodeFormat.CODE_128 && !fromAi01) {
+      return null;
+    }
+
     const base = fromAi01 ?? digitsOnly;
     if (!base) {
       return null;
@@ -188,7 +193,13 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
       normalized = normalized.slice(1);
     }
 
-    if (normalized.length === 8 || normalized.length === 12 || normalized.length === 13) {
+    if (normalized.length === 8 || normalized.length === 12 || normalized.length === 13 || normalized.length === 14) {
+      if (!this.isValidGtin(normalized)) {
+        return null;
+      }
+      if (normalized.length === 14 && normalized.startsWith("0")) {
+        return normalized.slice(1);
+      }
       return normalized;
     }
     return null;
@@ -209,5 +220,27 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
       return null;
     }
     return input.slice(start, end);
+  }
+
+  private isValidGtin(digits: string) {
+    if (!/^\d+$/.test(digits)) {
+      return false;
+    }
+    if (digits.length < 8 || digits.length > 14) {
+      return false;
+    }
+
+    const body = digits.slice(0, -1);
+    const checkDigit = Number(digits[digits.length - 1]);
+    let sum = 0;
+    let multiplier = 3;
+
+    for (let i = body.length - 1; i >= 0; i -= 1) {
+      sum += Number(body[i]) * multiplier;
+      multiplier = multiplier === 3 ? 1 : 3;
+    }
+
+    const computed = (10 - (sum % 10)) % 10;
+    return computed === checkDigit;
   }
 }
