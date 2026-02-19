@@ -39,7 +39,12 @@ export class InventoryStore {
       .pipe(finalize(() => this._loading.set(false)))
       .subscribe({
         next: (item) => {
-          this._items.set([item, ...this._items()]);
+          const existing = this._items().find((current) => current.id === item.id);
+          if (existing) {
+            this._replace(item);
+          } else {
+            this._items.set([item, ...this._items()]);
+          }
           this._error.set(null);
         },
         error: () => this._error.set("Could not create item.")
