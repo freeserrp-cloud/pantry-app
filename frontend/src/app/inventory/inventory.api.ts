@@ -1,14 +1,13 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { environment } from "../../environments/environment";
 
 import { InventoryItem, InventoryItemCreate, InventoryItemUpdate } from "./inventory.models";
-
-const API_BASE = "https://pantry-app-fm9y.onrender.com";
 
 @Injectable({ providedIn: "root" })
 export class InventoryApi {
   private http = inject(HttpClient);
-  private baseUrl = `${API_BASE}/items`;
+  private baseUrl = `${environment.apiUrl}/items`;
 
   list() {
     return this.http.get<InventoryItem[]>(this.baseUrl);
