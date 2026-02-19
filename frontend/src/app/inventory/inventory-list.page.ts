@@ -140,11 +140,11 @@ export class InventoryListPage implements OnInit {
 
   private async lookupProductName(barcode: string, itemId: string) {
     try {
-      const res = await fetch(`${API_BASE}/products/lookup/${encodeURIComponent(barcode)}`);
-      if (!res.ok) {
-        return;
-      }
-      const data = await res.json();
+      const data = await firstValueFrom(
+        this.http.get<{ name?: string; found?: boolean }>(
+          `${API_BASE}/products/lookup/${encodeURIComponent(barcode)}`
+        )
+      );
       if (data?.found && typeof data?.name === "string" && data.name.trim()) {
         await this.updateItemName(itemId, data.name.trim());
       }
@@ -154,13 +154,9 @@ export class InventoryListPage implements OnInit {
   }
 
   private async updateItemName(itemId: string, name: string) {
-    const response = await fetch(`${API_BASE}/items/${encodeURIComponent(itemId)}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name })
-    });
-    if (response.ok) {
-      this.store.loadItems();
-    }
+    await firstValueFrom(
+      this.http.put(`${API_BASE}/items/${encodeURIComponent(itemId)}`, { name })
+    );
+    this.store.loadItems();
   }
 }
