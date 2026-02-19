@@ -1,41 +1,60 @@
 .app-shell {
+  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  max-width: 860px;
+  max-width: 900px;
   margin: 0 auto;
   color: var(--text-main);
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(130deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 38%),
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.48) 0%, transparent 52%);
+  mix-blend-mode: screen;
+  z-index: -1;
 }
 
 .app-header {
   position: sticky;
   top: 0;
   z-index: 20;
-  margin: max(0.85rem, env(safe-area-inset-top)) 0.9rem 0.7rem;
-  padding: 0.9rem 1rem;
-  border-radius: 1rem;
-  border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  margin: max(0.8rem, env(safe-area-inset-top)) 0.85rem 0.75rem;
+  padding: 0.92rem 1rem;
+  border-radius: 1.12rem;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.83) 0%, rgba(240, 247, 255, 0.72) 100%);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
 }
 
 .title {
   font-family: "Outfit", sans-serif;
   font-weight: 700;
-  font-size: clamp(1.55rem, 5.6vw, 1.95rem);
+  font-size: clamp(1.62rem, 6vw, 2.05rem);
   letter-spacing: -0.02em;
+  background: linear-gradient(95deg, #0b1220 0%, #0a5acc 52%, #0d8fbc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .subtitle {
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   color: var(--text-muted);
-  margin-top: 0.25rem;
+  margin-top: 0.22rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .app-main {
   flex: 1;
-  padding: 0 0.9rem calc(1.4rem + env(safe-area-inset-bottom));
+  padding: 0 0.85rem calc(1.5rem + env(safe-area-inset-bottom));
 }
 
 @media (min-width: 768px) {
