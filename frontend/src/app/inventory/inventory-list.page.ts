@@ -118,26 +118,25 @@ export class InventoryListPage implements OnInit {
 
   private async addItem(barcode: string) {
     const fallbackName = `Produkt ${barcode}`;
-    let name = fallbackName;
-    let image = null;
+    let product: { name?: string; product_name?: string; image?: string | null; brand?: string | null } | null =
+      null;
 
     try {
       const res = await fetch(`${environment.apiUrl}/products/lookup/${barcode}`);
       if (res.ok) {
-        const data = await res.json();
-        if (data?.found && data?.name) {
-          name = data.name;
-          image = data.image ?? null;
-        }
+        product = await res.json();
       }
     } catch (e) {
       console.warn("lookup failed", e);
     }
 
-    void image;
+    const productName =
+      product?.name ||
+      product?.product_name ||
+      fallbackName;
 
     const item = {
-      name,
+      name: productName,
       quantity: 1
     };
 
