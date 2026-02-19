@@ -1,20 +1,19 @@
-import httpx
+import requests
 
 OFF_URL = "https://world.openfoodfacts.org/api/v0/product/"
 UPC_URL = "https://api.upcitemdb.com/prod/trial/lookup?upc="
 
 
-async def lookup_product(barcode: str):
-    # 1️⃣ OpenFoodFacts (primary)
+def lookup_product(barcode: str):
+    # 1️⃣ OpenFoodFacts
     try:
-        async with httpx.AsyncClient(timeout=5) as client:
-            r = await client.get(f"{OFF_URL}{barcode}.json")
-            data = r.json()
+        r = requests.get(f"{OFF_URL}{barcode}.json", timeout=5)
+        data = r.json()
 
         if data.get("status") == 1:
-            p = data.get("product", {})
-            name = p.get("product_name") or p.get("generic_name")
-            image = p.get("image_front_url")
+            product = data.get("product", {})
+            name = product.get("product_name") or product.get("generic_name")
+            image = product.get("image_front_url")
 
             if name:
                 return {
@@ -23,13 +22,12 @@ async def lookup_product(barcode: str):
                     "found": True
                 }
     except Exception as e:
-        print("OpenFoodFacts failed:", e)
+        print("OFF failed:", e)
 
-    # 2️⃣ UPCItemDB fallback
+    # 2️⃣ UPC fallback
     try:
-        async with httpx.AsyncClient(timeout=5) as client:
-            r = await client.get(f"{UPC_URL}{barcode}")
-            data = r.json()
+        r = requests.get(f"{UPC_URL}{barcode}", timeout=5)
+        data = r.json()
 
         items = data.get("items")
         if items:
@@ -40,9 +38,9 @@ async def lookup_product(barcode: str):
                 "found": True
             }
     except Exception as e:
-        print("UPC fallback failed:", e)
+        print("UPC failed:", e)
 
-    # 3️⃣ Final fallback
+    # fallback
     return {
         "name": f"Produkt {barcode}",
         "image": None,

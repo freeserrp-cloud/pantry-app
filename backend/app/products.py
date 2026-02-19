@@ -5,5 +5,10 @@ router = APIRouter()
 
 
 @router.get("/products/lookup/{barcode}")
-async def lookup(barcode: str):
-    return await lookup_product(barcode)
+def lookup(barcode: str):
+    return lookup_product(barcode)
+
+
+@router.get("/lookup/{barcode}")
+def lookup_alias(barcode: str):
+    return lookup_product(barcode)
