@@ -6,8 +6,7 @@ import { firstValueFrom } from "rxjs";
 
 import { InventoryStore } from "./inventory.store";
 import { BarcodeScannerComponent } from "../shared/barcode-scanner.component";
-
-const API_BASE = "https://pantry-app-fm9y.onrender.com";
+import { environment } from "../../environments/environment";
 
 @Component({
   selector: "app-inventory-list",
@@ -119,44 +118,37 @@ export class InventoryListPage implements OnInit {
 
   private async addItem(barcode: string) {
     const fallbackName = `Produkt ${barcode}`;
+    let name = fallbackName;
+    let image = null;
+
+    try {
+      const res = await fetch(`${environment.apiUrl}/products/lookup/${barcode}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.found && data?.name) {
+          name = data.name;
+          image = data.image ?? null;
+        }
+      }
+    } catch (e) {
+      console.warn("lookup failed", e);
+    }
+
+    void image;
+
     const item = {
-      name: fallbackName,
+      name,
       quantity: 1
     };
 
     try {
       const saved = (await firstValueFrom(
-        this.http.post<{ id?: string }>(`${API_BASE}/items`, item)
+        this.http.post<{ id?: string }>(`${environment.apiUrl}/items`, item)
       )) as { id?: string };
+      void saved;
       this.store.loadItems();
-
-      if (saved.id) {
-        void this.lookupProductName(barcode, saved.id);
-      }
     } catch (e) {
       console.error("Save failed", e);
     }
-  }
-
-  private async lookupProductName(barcode: string, itemId: string) {
-    try {
-      const data = await firstValueFrom(
-        this.http.get<{ name?: string; found?: boolean }>(
-          `${API_BASE}/products/lookup/${encodeURIComponent(barcode)}`
-        )
-      );
-      if (data?.found && typeof data?.name === "string" && data.name.trim()) {
-        await this.updateItemName(itemId, data.name.trim());
-      }
-    } catch {
-      // Ignore lookup failures.
-    }
-  }
-
-  private async updateItemName(itemId: string, name: string) {
-    await firstValueFrom(
-      this.http.put(`${API_BASE}/items/${encodeURIComponent(itemId)}`, { name })
-    );
-    this.store.loadItems();
   }
 }
