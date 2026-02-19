@@ -1,4 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Outfit:wght@500;600;700&display=swap");
+
+:root {
+  --bg-start: #f8fafc;
+  --bg-middle: #edf3ff;
+  --bg-end: #e7edf8;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-strong: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #5f6b81;
+  --line-soft: rgba(15, 23, 42, 0.09);
+  --shadow-soft: 0 12px 34px rgba(15, 23, 42, 0.08);
+  --shadow-strong: 0 20px 48px rgba(15, 23, 42, 0.14);
+  --accent: #0a84ff;
+  --accent-strong: #0066d6;
+  --accent-soft: #deedff;
+  --danger: #d83f2f;
+}
 
 * {
   box-sizing: border-box;
@@ -6,8 +23,11 @@
 
 body {
   margin: 0;
-  font-family: "Inter", sans-serif;
-  background: #f3f1ed;
+  font-family: "Manrope", sans-serif;
+  background: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-middle) 45%, var(--bg-end) 100%);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button {
@@ -17,4 +37,10 @@ button {
 
 a {
   color: inherit;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
 }

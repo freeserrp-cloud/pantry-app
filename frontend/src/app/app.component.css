@@ -2,28 +2,48 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at top, #f7f5f1 0%, #f3f1ed 35%, #efe7dd 100%);
-  color: #1d1c1a;
+  max-width: 860px;
+  margin: 0 auto;
+  color: var(--text-main);
 }
 
 .app-header {
-  padding: 1.5rem 1.25rem 0.75rem;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: max(0.85rem, env(safe-area-inset-top)) 0.9rem 0.7rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
 .title {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Outfit", sans-serif;
   font-weight: 700;
-  font-size: 1.9rem;
+  font-size: clamp(1.55rem, 5.6vw, 1.95rem);
   letter-spacing: -0.02em;
 }
 
 .subtitle {
-  font-size: 0.9rem;
-  color: #5b534b;
-  margin-top: 0.35rem;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
 }
 
 .app-main {
   flex: 1;
-  padding: 0 1.25rem 2rem;
+  padding: 0 0.9rem calc(1.4rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    padding: 0.3rem 0 1.1rem;
+  }
+
+  .app-main {
+    padding: 0 1.2rem 1.8rem;
+  }
 }
