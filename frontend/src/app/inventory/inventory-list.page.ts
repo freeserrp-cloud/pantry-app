@@ -6,8 +6,7 @@ import { firstValueFrom } from "rxjs";
 
 import { InventoryStore } from "./inventory.store";
 import { BarcodeScannerComponent } from "../shared/barcode-scanner.component";
-
-const API = "https://pantry-app-fm9y.onrender.com";
+import { environment } from "../../environments/environment";
 
 @Component({
   selector: "app-inventory-list",
@@ -126,7 +125,7 @@ export class InventoryListPage implements OnInit {
 
     try {
       const saved = (await firstValueFrom(
-        this.http.post<{ id?: string }>(`${API}/items`, item)
+        this.http.post<{ id?: string }>(`${environment.apiUrl}/items`, item)
       )) as { id?: string };
       this.store.loadItems();
 
@@ -140,7 +139,7 @@ export class InventoryListPage implements OnInit {
 
   private async lookupProductName(barcode: string, itemId: string) {
     try {
-      const res = await fetch(`${API}/products/lookup/${encodeURIComponent(barcode)}`);
+      const res = await fetch(`${environment.apiUrl}/products/lookup/${encodeURIComponent(barcode)}`);
       if (!res.ok) {
         return;
       }
@@ -154,7 +153,7 @@ export class InventoryListPage implements OnInit {
   }
 
   private async updateItemName(itemId: string, name: string) {
-    const response = await fetch(`${API}/items/${encodeURIComponent(itemId)}`, {
+    const response = await fetch(`${environment.apiUrl}/items/${encodeURIComponent(itemId)}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name })
