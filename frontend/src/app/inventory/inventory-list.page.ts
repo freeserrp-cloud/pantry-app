@@ -1,8 +1,6 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { NgFor, NgIf } from "@angular/common";
-import { HttpClient } from "@angular/common/http";
 import { RouterLink } from "@angular/router";
-import { firstValueFrom } from "rxjs";
 
 import { InventoryStore } from "./inventory.store";
 import { BarcodeScannerComponent } from "../shared/barcode-scanner.component";
@@ -82,7 +80,6 @@ import { environment } from "../../environments/environment";
 })
 export class InventoryListPage implements OnInit {
   store = inject(InventoryStore);
-  private http = inject(HttpClient);
   private readonly maxNameLength = 200;
   private readonly cacheStorageKey = "barcode-name-cache-v1";
   private barcodeNameCache = new Map<string, string>();
@@ -124,25 +121,27 @@ export class InventoryListPage implements OnInit {
   }
 
   private async handleDetected(barcode: string) {
-    const existingByBarcode = this.findExistingItemByBarcode(barcode);
+    const normalizedBarcode = this.normalizeBarcodeForPersist(barcode);
+    const existingByBarcode = this.findExistingItemByBarcode(normalizedBarcode);
     if (existingByBarcode) {
-      try {
-        const updated = (await firstValueFrom(
-          this.http.post<{ id?: string }>(`${environment.apiUrl}/items/${existingByBarcode.id}/increment`, {})
-        )) as { id?: string };
-        void updated;
-        this.store.loadItems();
-        return;
-      } catch (e) {
-        console.warn("fast increment failed", e);
-      }
+      this.store.increment(existingByBarcode.id);
+      return;
     }
 
-    const productName = await this.lookupProductName(barcode);
-    void this.addItem({
-      barcode,
-      name: this.normalizeName(productName, barcode)
+    const candidates = this.getBarcodeCandidates(normalizedBarcode);
+    const cachedName = this.getCachedName(candidates);
+    const initialName = this.normalizeName(cachedName ?? `Produkt ${normalizedBarcode}`, normalizedBarcode);
+
+    this.addItem({
+      barcode: normalizedBarcode,
+      name: initialName
     });
+
+    if (cachedName) {
+      return;
+    }
+
+    void this.resolveNameInBackground(normalizedBarcode);
   }
 
   private async lookupProductName(barcode: string) {
@@ -182,41 +181,25 @@ export class InventoryListPage implements OnInit {
   }
 
   private async addItem(payload: { barcode: string; name: string }) {
-    try {
-      const existingByBarcode = this.findExistingItemByBarcode(payload.barcode);
-      if (existingByBarcode) {
-        const updated = (await firstValueFrom(
-          this.http.post<{ id?: string }>(`${environment.apiUrl}/items/${existingByBarcode.id}/increment`, {})
-        )) as { id?: string };
-        void updated;
-        this.store.loadItems();
-        return;
-      }
-
-      const existing = this.findExistingItemByName(payload.name);
-      if (existing) {
-        const updated = (await firstValueFrom(
-          this.http.post<{ id?: string }>(`${environment.apiUrl}/items/${existing.id}/increment`, {})
-        )) as { id?: string };
-        void updated;
-        this.store.loadItems();
-        return;
-      }
-
-      const created = (await firstValueFrom(
-        this.http.post<{ id?: string }>(`${environment.apiUrl}/items`, {
-          name: payload.name,
-          barcode: this.normalizeBarcodeForPersist(payload.barcode),
-          quantity: 1,
-          min_quantity: 0,
-          category: null
-        })
-      )) as { id?: string };
-      void created;
-      this.store.loadItems();
-    } catch (e) {
-      console.error("Save failed", e);
+    const existingByBarcode = this.findExistingItemByBarcode(payload.barcode);
+    if (existingByBarcode) {
+      this.store.increment(existingByBarcode.id);
+      return;
     }
+
+    const existing = this.findExistingItemByName(payload.name);
+    if (existing) {
+      this.store.increment(existing.id);
+      return;
+    }
+
+    this.store.createItem({
+      name: payload.name,
+      barcode: this.normalizeBarcodeForPersist(payload.barcode),
+      quantity: 1,
+      min_quantity: 0,
+      category: null
+    });
   }
 
   private normalizeName(name: string, barcode: string) {
@@ -348,6 +331,39 @@ export class InventoryListPage implements OnInit {
       normalized = normalized.slice(1);
     }
     return normalized;
+  }
+
+  private async resolveNameInBackground(barcode: string) {
+    const lookedUpName = await this.lookupProductName(barcode);
+    const normalizedName = this.normalizeName(lookedUpName, barcode);
+    if (this.isPlaceholderName(normalizedName, barcode)) {
+      return;
+    }
+
+    const candidates = this.getBarcodeCandidates(barcode);
+    this.cacheNameForCandidates(candidates, normalizedName);
+
+    const target = await this.waitForItemByBarcode(barcode);
+    if (!target) {
+      return;
+    }
+    if (this.normalizeProductKey(target.name) === this.normalizeProductKey(normalizedName)) {
+      return;
+    }
+
+    this.store.updateItem(target.id, { name: normalizedName });
+  }
+
+  private async waitForItemByBarcode(barcode: string, timeoutMs = 2500) {
+    const start = Date.now();
+    while (Date.now() - start <= timeoutMs) {
+      const item = this.findExistingItemByBarcode(barcode);
+      if (item) {
+        return item;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 120));
+    }
+    return null;
   }
 
   private extractGtinFromGs1(digits: string) {
