@@ -72,6 +72,45 @@ import { environment } from "../../environments/environment";
         <div class="scanner-error-banner" *ngIf="scannerError()">
           {{ scannerError() }}
         </div>
+        <div class="scanner-fallback" *ngIf="showManualFallback()">
+          <p class="scanner-fallback-title">Barcode nicht erkannt?</p>
+          <p class="scanner-fallback-subtitle">Du kannst den Artikel trotzdem schnell erfassen.</p>
+
+          <div class="scanner-fallback-actions" *ngIf="manualMode() === null">
+            <button class="scanner-fallback-btn" (click)="openManualNameEntry()">Produkt manuell erfassen</button>
+            <button class="scanner-fallback-btn ghost" (click)="openManualBarcodeEntry()">Barcode manuell eingeben</button>
+            <button class="scanner-fallback-btn ghost" (click)="closeScanner()">Abbrechen</button>
+          </div>
+
+          <div class="scanner-fallback-form" *ngIf="manualMode() === 'name'">
+            <input
+              #manualNameInput
+              type="text"
+              placeholder="Produktname"
+              (input)="manualName.set(manualNameInput.value)"
+              [value]="manualName()"
+            />
+            <div class="scanner-fallback-actions">
+              <button class="scanner-fallback-btn" (click)="submitManualName()" [disabled]="!manualName().trim()">Speichern</button>
+              <button class="scanner-fallback-btn ghost" (click)="resetManualFallbackState()">Zurück</button>
+            </div>
+          </div>
+
+          <div class="scanner-fallback-form" *ngIf="manualMode() === 'barcode'">
+            <input
+              #manualBarcodeInput
+              type="text"
+              inputmode="numeric"
+              placeholder="Barcode eingeben"
+              (input)="manualBarcode.set(manualBarcodeInput.value)"
+              [value]="manualBarcode()"
+            />
+            <div class="scanner-fallback-actions">
+              <button class="scanner-fallback-btn" (click)="submitManualBarcode()" [disabled]="!manualBarcode().trim()">Übernehmen</button>
+              <button class="scanner-fallback-btn ghost" (click)="resetManualFallbackState()">Zurück</button>
+            </div>
+          </div>
+        </div>
         <button class="scanner-cancel" (click)="closeScanner()">Cancel</button>
       </div>
     </div>
@@ -82,9 +121,15 @@ export class InventoryListPage implements OnInit {
   store = inject(InventoryStore);
   private readonly maxNameLength = 200;
   private readonly cacheStorageKey = "barcode-name-cache-v1";
+  private readonly scannerFallbackDelayMs = 3000;
+  private scannerFallbackTimer: ReturnType<typeof setTimeout> | null = null;
   private barcodeNameCache = new Map<string, string>();
   showScanner = signal(false);
   scannerError = signal<string | null>(null);
+  showManualFallback = signal(false);
+  manualMode = signal<"name" | "barcode" | null>(null);
+  manualName = signal("");
+  manualBarcode = signal("");
 
   constructor() {
     this.barcodeNameCache = this.loadBarcodeNameCache();
@@ -104,20 +149,81 @@ export class InventoryListPage implements OnInit {
 
   openScanner() {
     this.scannerError.set(null);
+    this.resetManualFallbackState();
     this.showScanner.set(true);
+    this.startScannerFallbackTimer();
   }
 
   closeScanner() {
+    this.clearScannerFallbackTimer();
+    this.resetManualFallbackState();
     this.showScanner.set(false);
   }
 
   onDetected(barcode: string) {
+    this.clearScannerFallbackTimer();
+    this.resetManualFallbackState();
     this.showScanner.set(false);
     void this.handleDetected(barcode);
   }
 
   onScannerError(message: string) {
     this.scannerError.set(message);
+    this.showManualFallback.set(true);
+  }
+
+  openManualNameEntry() {
+    this.manualMode.set("name");
+    this.manualName.set("");
+  }
+
+  openManualBarcodeEntry() {
+    this.manualMode.set("barcode");
+    this.manualBarcode.set("");
+  }
+
+  submitManualName() {
+    const name = this.manualName().trim();
+    if (!name) {
+      return;
+    }
+
+    this.closeScanner();
+    this.addItem({ barcode: "", name });
+  }
+
+  submitManualBarcode() {
+    const barcode = this.manualBarcode().trim();
+    if (!barcode) {
+      return;
+    }
+
+    this.closeScanner();
+    void this.handleDetected(barcode);
+  }
+
+  resetManualFallbackState() {
+    this.showManualFallback.set(false);
+    this.manualMode.set(null);
+    this.manualName.set("");
+    this.manualBarcode.set("");
+  }
+
+  private startScannerFallbackTimer() {
+    this.clearScannerFallbackTimer();
+    this.scannerFallbackTimer = setTimeout(() => {
+      if (this.showScanner()) {
+        this.showManualFallback.set(true);
+      }
+    }, this.scannerFallbackDelayMs);
+  }
+
+  private clearScannerFallbackTimer() {
+    if (!this.scannerFallbackTimer) {
+      return;
+    }
+    clearTimeout(this.scannerFallbackTimer);
+    this.scannerFallbackTimer = null;
   }
 
   private async handleDetected(barcode: string) {
@@ -193,9 +299,10 @@ export class InventoryListPage implements OnInit {
       return;
     }
 
+    const normalizedBarcode = this.normalizeBarcodeForPersist(payload.barcode);
     this.store.createItem({
       name: payload.name,
-      barcode: this.normalizeBarcodeForPersist(payload.barcode),
+      barcode: normalizedBarcode || null,
       quantity: 1,
       min_quantity: 0,
       category: null

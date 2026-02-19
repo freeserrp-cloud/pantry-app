@@ -199,6 +199,69 @@
   text-align: center;
 }
 
+.scanner-fallback {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 4.75rem;
+  background: rgba(17, 17, 17, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 0.85rem;
+  padding: 0.9rem;
+  color: #fff;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.scanner-fallback-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.scanner-fallback-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.scanner-fallback-actions {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.scanner-fallback-btn {
+  width: 100%;
+  border: none;
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  background: #f5f0e8;
+  color: #1d1c1a;
+  font-weight: 700;
+}
+
+.scanner-fallback-btn.ghost {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.scanner-fallback-btn:disabled {
+  opacity: 0.55;
+}
+
+.scanner-fallback-form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.scanner-fallback-form input {
+  width: 100%;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+  padding: 0.6rem 0.7rem;
+}
+
 @media (min-width: 768px) {
   .inventory-header {
     margin-top: 2rem;
