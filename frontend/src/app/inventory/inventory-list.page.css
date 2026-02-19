@@ -6,15 +6,15 @@
 
 .inventory-header h1 {
   margin: 0;
-  font-size: clamp(1.6rem, 5.5vw, 2rem);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  font-size: clamp(1.6rem, 5.3vw, 1.95rem);
+  letter-spacing: -0.02em;
+  font-weight: 700;
 }
 
 .hint {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  font-size: 0.92rem;
 }
 
 .actions {
@@ -26,66 +26,63 @@
 .secondary {
   min-height: 48px;
   border-radius: var(--radius-button);
-  font-size: 0.95rem;
-  font-weight: 700;
-  text-decoration: none;
   border: none;
+  text-decoration: none;
+  font-size: 0.94rem;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0 16px;
-  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  transition: all 0.15s ease;
 }
 
 .primary {
-  background: var(--accent);
+  background: linear-gradient(180deg, #43cf67 0%, #34c759 100%);
   color: #fff;
-  box-shadow: 0 6px 18px rgba(76, 175, 80, 0.26);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .secondary {
-  background: #fff;
-  color: var(--text-primary);
-  border: 1px solid var(--line-soft);
-  box-shadow: var(--shadow-soft);
+  background: #e5e5ea;
+  color: #1c1c1e;
 }
 
 .primary:active,
 .secondary:active,
 .qty-btn:active,
-.scanner-fallback-btn:active,
-.scanner-cancel:active {
-  transform: scale(0.97);
+.scanner-cancel:active,
+.scanner-fallback-btn:active {
+  transform: scale(0.96);
 }
 
 .inventory-list {
   display: grid;
-  gap: var(--space-2);
-  animation: listFadeIn 220ms ease both;
+  gap: 18px;
+  animation: listFadeIn 180ms ease both;
 }
 
 .item-card {
-  background: var(--card);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid #eef0f3;
-  padding: var(--space-2);
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  padding: 18px;
   display: grid;
   gap: 14px;
-  animation: cardFadeIn 220ms ease both;
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  animation: cardFadeIn 180ms ease both;
 }
 
 .item-card.low {
-  border-color: rgba(76, 175, 80, 0.45);
-  background: linear-gradient(180deg, #ffffff 0%, #f7fff8 100%);
+  outline: 1px solid rgba(52, 199, 89, 0.28);
 }
 
 .item-main {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: flex-start;
+  gap: 14px;
 }
 
 .item-left {
@@ -98,10 +95,10 @@
 .item-thumb {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(140deg, #e8f8ea 0%, #f4fff5 100%);
-  color: var(--accent-dark);
-  font-weight: 800;
+  border-radius: 14px;
+  background: #f2f2f7;
+  color: #3a3a3c;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -113,9 +110,9 @@
 }
 
 .item-name {
+  font-size: 1.05rem;
   font-weight: 700;
-  font-size: 1rem;
-  color: var(--text-primary);
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -125,25 +122,25 @@
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-top: 5px;
 }
 
 .item-meta span {
   font-size: 0.74rem;
   color: var(--text-secondary);
-  background: #f4f5f7;
-  border-radius: 999px;
+  background: #f2f2f7;
+  border-radius: 10px;
   padding: 2px 8px;
 }
 
 .quantity {
   min-width: 52px;
-  height: 44px;
+  height: 36px;
+  padding: 0 10px;
   border-radius: 12px;
-  background: #f3f4f6;
-  color: #1f2937;
-  font-size: 1.25rem;
-  font-weight: 700;
+  background: #f2f2f7;
+  font-weight: 600;
+  color: #1c1c1e;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -156,14 +153,15 @@
 }
 
 .qty-btn {
-  min-height: 46px;
+  min-height: 44px;
   border: none;
-  border-radius: var(--radius-button);
-  background: #111111;
-  color: #ffffff;
-  font-size: 1.2rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #2c2c2e 0%, #1c1c1e 100%);
+  color: #fff;
+  font-size: 1.14rem;
   font-weight: 700;
-  transition: transform 180ms ease, background-color 180ms ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: transform 0.15s ease;
 }
 
 .item-links {
@@ -174,14 +172,14 @@
 }
 
 .item-links a {
-  color: #1f2937;
+  color: #1c1c1e;
   text-decoration: none;
   font-weight: 600;
 }
 
 .item-links .ghost {
-  border: none;
   background: transparent;
+  border: none;
   color: var(--text-secondary);
   font-weight: 600;
 }
@@ -192,17 +190,16 @@
 
 .empty-card {
   background: #fff;
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid #eef0f3;
-  text-align: center;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   padding: var(--space-3);
+  text-align: center;
 }
 
 .loading,
 .error {
   margin: 0 0 var(--space-2);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 
 .error {
@@ -212,7 +209,7 @@
 .scanner-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(17, 17, 17, 0.64);
+  background: rgba(17, 17, 17, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -227,7 +224,7 @@
   border-radius: 24px;
   overflow: hidden;
   background: #000;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
 }
 
 .scanner-cancel {
@@ -235,13 +232,14 @@
   left: 50%;
   transform: translateX(-50%);
   bottom: calc(12px + env(safe-area-inset-bottom));
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
   min-height: 42px;
   padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
   font-weight: 600;
+  transition: all 0.15s ease;
 }
 
 .scanner-error-banner {
@@ -289,13 +287,14 @@
 }
 
 .scanner-fallback-btn {
+  min-height: 42px;
   border: none;
   border-radius: 12px;
-  min-height: 42px;
   background: #fff;
   color: #111;
   font-size: 0.9rem;
   font-weight: 700;
+  transition: all 0.15s ease;
 }
 
 .scanner-fallback-btn.ghost {
@@ -344,7 +343,7 @@
 @media (min-width: 900px) {
   .item-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -367,16 +366,16 @@
     padding: 0;
     border-radius: var(--radius-floating);
     z-index: 900;
-    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
     font-size: 0;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
   }
 
   .actions .secondary::before {
     content: "+";
+    color: #1c1c1e;
     font-size: 1.9rem;
+    font-weight: 400;
     line-height: 1;
-    color: var(--accent);
-    font-weight: 500;
   }
 
   .scanner-modal {
@@ -389,5 +388,6 @@
 @media (min-width: 768px) {
   .inventory-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
   }
 }
