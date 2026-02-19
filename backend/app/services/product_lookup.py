@@ -1,27 +1,37 @@
-import httpx
+import requests
 
 API = "https://world.openfoodfacts.org/api/v0/product/"
+cache: dict[str, dict] = {}
 
 
-async def lookup_product_name(barcode: str) -> dict:
+def fetch_product_from_openfoodfacts(barcode: str):
+    if barcode in cache:
+        return cache[barcode]
+
     url = f"{API}{barcode}.json"
+
     try:
-        async with httpx.AsyncClient(timeout=4.0) as client:
-            r = await client.get(url)
-            data = r.json()
+        res = requests.get(url, timeout=3)
+        data = res.json()
 
-        product = data.get("product", {})
-
-        name = (
-            product.get("product_name_de")
-            or product.get("product_name")
-            or product.get("brands")
-        )
-
-        if name:
-            return {"name": name, "found": True}
-
+        if data.get("status") == 1:
+            product = data["product"]
+            result = {
+                "name": product.get("product_name") or f"Produkt {barcode}",
+                "image": product.get("image_front_url"),
+                "brand": product.get("brands"),
+                "found": True
+            }
+            cache[barcode] = result
+            return result
     except Exception:
         pass
 
-    return {"name": f"Produkt {barcode}", "found": False}
+    result = {
+        "name": f"Produkt {barcode}",
+        "image": None,
+        "brand": None,
+        "found": False
+    }
+    cache[barcode] = result
+    return result

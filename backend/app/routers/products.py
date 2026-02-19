@@ -1,16 +1,16 @@
 from fastapi import APIRouter
 
-from app.services.product_lookup import lookup_product_name
+from app.services.product_lookup import fetch_product_from_openfoodfacts
 
 
 router = APIRouter(tags=["products"])
 
 
 @router.get("/products/lookup/{barcode}")
-async def lookup_product(barcode: str):
-    return await lookup_product_name(barcode)
+def lookup_product(barcode: str):
+    return fetch_product_from_openfoodfacts(barcode)
 
 
 @router.get("/lookup/{barcode}")
-async def lookup_product_alias(barcode: str):
-    return await lookup_product_name(barcode)
+def lookup_product_alias(barcode: str):
+    return fetch_product_from_openfoodfacts(barcode)
