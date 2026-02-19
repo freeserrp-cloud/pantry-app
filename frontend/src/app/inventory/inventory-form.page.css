@@ -88,7 +88,7 @@ input:focus {
   background: linear-gradient(180deg, #43cf67 0%, #34c759 100%);
   color: #fff;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transition: all 0.15s ease;
 }
