@@ -17,13 +17,13 @@ import { BrowserMultiFormatReader } from "@zxing/browser";
   styleUrls: ["./barcode-scanner.component.css"]
 })
 export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
-  @ViewChild("video", { static: true }) video!: ElementRef<HTMLVideoElement>;
+  @ViewChild("video", { static: true }) videoRef!: ElementRef<HTMLVideoElement>;
 
-  @Output() detected = new EventEmitter<{ barcode: string }>();
+  @Output() detected = new EventEmitter<string>();
   @Output() error = new EventEmitter<string>();
 
   errorMessage: string | null = null;
-  private reader = new BrowserMultiFormatReader() as BrowserMultiFormatReader & { reset: () => void };
+  private reader = new BrowserMultiFormatReader();
   private stream: MediaStream | null = null;
   private active = false;
 
@@ -49,7 +49,7 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
           height: { ideal: 480 }
         }
       });
-      const videoEl = this.video.nativeElement;
+      const videoEl = this.videoRef.nativeElement;
       videoEl.srcObject = this.stream;
       await videoEl.play();
       const track = this.stream.getVideoTracks()[0];
@@ -66,7 +66,7 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
           if (result) {
             const text = typeof result.getText === "function" ? result.getText() : null;
             if (text) {
-              this.detected.emit({ barcode: text });
+              this.detected.emit(text);
               this.stop();
             }
             return;
@@ -102,15 +102,19 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
   }
 
   private stop() {
+    if (!this.active && !this.videoRef?.nativeElement) {
+      return;
+    }
     this.active = false;
-    this.reader.reset();
-    const videoEl = this.video?.nativeElement;
-    const videoStream = videoEl?.srcObject as MediaStream | null;
-    videoStream?.getTracks().forEach((track) => track.stop());
+    const video = this.videoRef?.nativeElement;
+    const stream = video?.srcObject as MediaStream | null;
+
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      video.srcObject = null;
+    }
+
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = null;
-    if (videoEl) {
-      videoEl.srcObject = null;
-    }
   }
 }

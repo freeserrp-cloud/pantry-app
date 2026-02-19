@@ -1,6 +1,8 @@
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { NgFor, NgIf } from "@angular/common";
+import { HttpClient } from "@angular/common/http";
 import { RouterLink } from "@angular/router";
+import { firstValueFrom } from "rxjs";
 
 import { InventoryStore } from "./inventory.store";
 import { BarcodeScannerComponent } from "../shared/barcode-scanner.component";
@@ -80,6 +82,7 @@ import { environment } from "../../environments/environment";
 })
 export class InventoryListPage implements OnInit {
   store = inject(InventoryStore);
+  private http = inject(HttpClient);
   showScanner = signal(false);
   scannerError = signal<string | null>(null);
 
@@ -104,9 +107,9 @@ export class InventoryListPage implements OnInit {
     this.showScanner.set(false);
   }
 
-  onDetected(payload: { barcode: string }) {
+  onDetected(barcode: string) {
     this.showScanner.set(false);
-    void this.addItem(payload.barcode);
+    void this.addItem(barcode);
   }
 
   onScannerError(message: string) {
@@ -121,16 +124,9 @@ export class InventoryListPage implements OnInit {
     };
 
     try {
-      const response = await fetch(`${environment.apiUrl}/items`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(item)
-      });
-      if (!response.ok) {
-        throw new Error("Save failed");
-      }
-
-      const saved = (await response.json()) as { id?: string };
+      const saved = (await firstValueFrom(
+        this.http.post<{ id?: string }>(`${environment.apiUrl}/items`, item)
+      )) as { id?: string };
       this.store.loadItems();
 
       if (saved.id) {
