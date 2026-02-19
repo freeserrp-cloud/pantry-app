@@ -109,34 +109,36 @@ export class InventoryListPage implements OnInit {
 
   onDetected(barcode: string) {
     this.showScanner.set(false);
-    void this.addItem(barcode);
+    void this.handleDetected(barcode);
   }
 
   onScannerError(message: string) {
     this.scannerError.set(message);
   }
 
-  private async addItem(barcode: string) {
-    const fallbackName = `Produkt ${barcode}`;
-    let product: { name?: string; product_name?: string; image?: string | null; brand?: string | null } | null =
-      null;
+  private async handleDetected(barcode: string) {
+    const productName = await this.lookupProductName(barcode);
+    void this.addItem({ barcode, name: productName });
+  }
 
+  private async lookupProductName(barcode: string) {
     try {
-      const res = await fetch(`${environment.apiUrl}/products/lookup/${barcode}`);
-      if (res.ok) {
-        product = await res.json();
-      }
+      const response = await fetch(`${environment.apiUrl}/products/lookup/${barcode}`);
+      const data = await response.json();
+      console.log("API PRODUCT:", data);
+      const productName = data?.name?.trim();
+      return productName && productName.length > 0
+        ? productName
+        : `Produkt ${barcode}`;
     } catch (e) {
       console.warn("lookup failed", e);
+      return `Produkt ${barcode}`;
     }
+  }
 
-    const productName =
-      product?.name ||
-      product?.product_name ||
-      fallbackName;
-
+  private async addItem(payload: { barcode: string; name: string }) {
     const item = {
-      name: productName,
+      name: payload.name,
       quantity: 1
     };
 
