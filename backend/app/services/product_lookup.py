@@ -1,37 +1,51 @@
-import requests
+import httpx
 
-API = "https://world.openfoodfacts.org/api/v0/product/"
-cache: dict[str, dict] = {}
+OPENFOODFACTS_URL = "https://world.openfoodfacts.org/api/v0/product/"
 
 
-def fetch_product_from_openfoodfacts(barcode: str):
-    if barcode in cache:
-        return cache[barcode]
-
-    url = f"{API}{barcode}.json"
-
+async def lookup_product(barcode: str) -> dict:
     try:
-        res = requests.get(url, timeout=3)
+        async with httpx.AsyncClient(timeout=5) as client:
+            res = await client.get(f"{OPENFOODFACTS_URL}{barcode}.json")
+
+        if res.status_code != 200:
+            return fallback(barcode)
+
         data = res.json()
 
-        if data.get("status") == 1:
-            product = data["product"]
-            result = {
-                "name": product.get("product_name") or f"Produkt {barcode}",
-                "image": product.get("image_front_url"),
-                "brand": product.get("brands"),
-                "found": True
-            }
-            cache[barcode] = result
-            return result
-    except Exception:
-        pass
+        if data.get("status") != 1:
+            return fallback(barcode)
 
-    result = {
+        product = data.get("product", {})
+
+        name = (
+            product.get("product_name")
+            or product.get("product_name_de")
+            or product.get("generic_name")
+        )
+
+        brand = product.get("brands")
+
+        image = (
+            product.get("image_front_url")
+            or product.get("image_url")
+        )
+
+        return {
+            "name": name or f"Produkt {barcode}",
+            "brand": brand,
+            "image": image,
+            "found": bool(name),
+        }
+
+    except Exception:
+        return fallback(barcode)
+
+
+def fallback(barcode: str) -> dict:
+    return {
         "name": f"Produkt {barcode}",
-        "image": None,
         "brand": None,
-        "found": False
+        "image": None,
+        "found": False,
     }
-    cache[barcode] = result
-    return result

@@ -4,9 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.database import engine
 from app.models.inventory_item import Base
+from app.products import router as products_router
 from app.routers.health import router as health_router
 from app.routers.inventory import router as inventory_router
-from app.routers.products import router as products_router
 
 
 settings = get_settings()
