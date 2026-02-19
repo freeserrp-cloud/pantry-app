@@ -41,11 +41,16 @@ import { environment } from "../../environments/environment";
         [class.low]="isLow(item.quantity, item.min_quantity)"
       >
         <div class="item-main">
-          <div>
-            <div class="item-name">{{ item.name }}</div>
-            <div class="item-meta">
-              <span *ngIf="item.category">{{ item.category }}</span>
-              <span *ngIf="item.min_quantity > 0">Min {{ item.min_quantity }}</span>
+          <div class="item-left">
+            <div class="item-thumb" aria-hidden="true">
+              {{ item.name.charAt(0).toUpperCase() }}
+            </div>
+            <div class="item-details">
+              <div class="item-name">{{ item.name }}</div>
+              <div class="item-meta">
+                <span *ngIf="item.category">{{ item.category }}</span>
+                <span *ngIf="item.min_quantity > 0">Min {{ item.min_quantity }}</span>
+              </div>
             </div>
           </div>
           <div class="quantity" [attr.aria-label]="'Quantity ' + item.quantity">

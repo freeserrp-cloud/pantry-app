@@ -1,22 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Outfit:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 :root {
-  --bg-start: #f6fbff;
-  --bg-middle: #ebf2ff;
-  --bg-end: #e8ebff;
-  --surface: rgba(255, 255, 255, 0.88);
-  --surface-strong: #ffffff;
-  --text-main: #0b1220;
-  --text-muted: #667089;
-  --line-soft: rgba(15, 23, 42, 0.09);
-  --shadow-soft: 0 14px 38px rgba(15, 23, 42, 0.09);
-  --shadow-strong: 0 26px 60px rgba(15, 23, 42, 0.18);
-  --accent: #0a84ff;
-  --accent-strong: #005fcb;
-  --accent-soft: #ddedff;
-  --accent-mint: #2dd4bf;
-  --accent-pink: #ff4ecb;
-  --danger: #d83f2f;
+  --bg: #f7f7f8;
+  --card: #ffffff;
+  --text-primary: #111111;
+  --text-secondary: #6b7280;
+  --accent: #4caf50;
+  --accent-dark: #3f9643;
+  --line-soft: #e9eaed;
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.08);
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-floating: 22px;
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
 }
 
 * {
@@ -25,13 +24,9 @@
 
 body {
   margin: 0;
-  font-family: "Manrope", sans-serif;
-  background:
-    radial-gradient(circle at 12% 8%, rgba(45, 212, 191, 0.16) 0%, transparent 32%),
-    radial-gradient(circle at 88% 22%, rgba(10, 132, 255, 0.22) 0%, transparent 42%),
-    radial-gradient(circle at 50% 100%, rgba(255, 78, 203, 0.13) 0%, transparent 44%),
-    linear-gradient(160deg, var(--bg-start) 0%, var(--bg-middle) 45%, var(--bg-end) 100%);
-  color: var(--text-main);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   min-height: 100vh;
@@ -50,4 +45,9 @@ input,
 textarea,
 button {
   font: inherit;
+}
+
+button,
+a {
+  transition: all 180ms ease;
 }

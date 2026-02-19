@@ -1,68 +1,44 @@
 .app-shell {
-  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  max-width: 900px;
+  max-width: 760px;
   margin: 0 auto;
-  color: var(--text-main);
-}
-
-.app-shell::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(130deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0) 38%),
-    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.48) 0%, transparent 52%);
-  mix-blend-mode: screen;
-  z-index: -1;
+  color: var(--text-primary);
 }
 
 .app-header {
   position: sticky;
   top: 0;
-  z-index: 20;
-  margin: max(0.8rem, env(safe-area-inset-top)) 0.85rem 0.75rem;
-  padding: 0.92rem 1rem;
-  border-radius: 1.12rem;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.83) 0%, rgba(240, 247, 255, 0.72) 100%);
-  backdrop-filter: blur(18px) saturate(1.2);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+  z-index: 30;
+  margin: 0;
+  padding: calc(env(safe-area-inset-top) + var(--space-2)) var(--space-2) var(--space-1);
+  background: rgba(247, 247, 248, 0.86);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-soft);
 }
 
 .title {
-  font-family: "Outfit", sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.62rem, 6vw, 2.05rem);
-  letter-spacing: -0.02em;
-  background: linear-gradient(95deg, #0b1220 0%, #0a5acc 52%, #0d8fbc 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-weight: 800;
+  font-size: clamp(1.7rem, 5vw, 2rem);
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
 }
 
 .subtitle {
-  font-size: 0.84rem;
-  color: var(--text-muted);
-  margin-top: 0.22rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-weight: 500;
 }
 
 .app-main {
   flex: 1;
-  padding: 0 0.85rem calc(1.5rem + env(safe-area-inset-bottom));
+  padding: var(--space-2) var(--space-2) calc(var(--space-4) + env(safe-area-inset-bottom));
 }
 
 @media (min-width: 768px) {
-  .app-shell {
-    padding: 0.3rem 0 1.1rem;
-  }
-
   .app-main {
-    padding: 0 1.2rem 1.8rem;
+    padding: var(--space-3) var(--space-3) var(--space-4);
   }
 }
