@@ -14,6 +14,7 @@ class InventoryItem(Base):
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     household_id = Column(String(36), index=True, nullable=False)
     name = Column(String(200), nullable=False, index=True)
+    barcode = Column(String(64), nullable=True, index=True)
     quantity = Column(Integer, nullable=False, default=0)
     min_quantity = Column(Integer, nullable=False, default=0)
     category = Column(String(120), nullable=True, index=True)

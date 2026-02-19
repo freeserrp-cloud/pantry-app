@@ -1,6 +1,6 @@
 from typing import Iterable, Optional
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.inventory_item import InventoryItem
@@ -14,6 +14,20 @@ class InventoryRepository:
     def get_item(self, db: Session, item_id: str, household_id: str) -> Optional[InventoryItem]:
         stmt = select(InventoryItem).where(
             InventoryItem.id == item_id,
+            InventoryItem.household_id == household_id,
+        )
+        return db.execute(stmt).scalars().first()
+
+    def get_item_by_barcode(self, db: Session, barcode: str, household_id: str) -> Optional[InventoryItem]:
+        stmt = select(InventoryItem).where(
+            InventoryItem.barcode == barcode,
+            InventoryItem.household_id == household_id,
+        )
+        return db.execute(stmt).scalars().first()
+
+    def get_item_by_name(self, db: Session, name: str, household_id: str) -> Optional[InventoryItem]:
+        stmt = select(InventoryItem).where(
+            func.lower(InventoryItem.name) == name.lower(),
             InventoryItem.household_id == household_id,
         )
         return db.execute(stmt).scalars().first()

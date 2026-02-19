@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 class InventoryItemBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
+    barcode: Optional[str] = Field(None, min_length=1, max_length=64)
     quantity: int = Field(0, ge=0)
     min_quantity: int = Field(0, ge=0)
     category: Optional[str] = Field(None, max_length=120)
@@ -17,6 +18,7 @@ class InventoryItemCreate(InventoryItemBase):
 
 class InventoryItemUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=200)
+    barcode: Optional[str] = Field(None, min_length=1, max_length=64)
     quantity: Optional[int] = Field(None, ge=0)
     min_quantity: Optional[int] = Field(None, ge=0)
     category: Optional[str] = Field(None, max_length=120)

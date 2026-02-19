@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import inspect, text
 
 from app.core.config import get_settings
 from app.core.database import engine
@@ -30,3 +31,17 @@ app.include_router(products_router, prefix="/products", tags=["products"])
 @app.on_event("startup")
 def on_startup() -> None:
     Base.metadata.create_all(bind=engine)
+    ensure_inventory_barcode_column()
+
+
+def ensure_inventory_barcode_column() -> None:
+    inspector = inspect(engine)
+    if "inventory_items" not in inspector.get_table_names():
+        return
+
+    column_names = {column["name"] for column in inspector.get_columns("inventory_items")}
+    if "barcode" in column_names:
+        return
+
+    with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE inventory_items ADD COLUMN barcode VARCHAR(64)"))

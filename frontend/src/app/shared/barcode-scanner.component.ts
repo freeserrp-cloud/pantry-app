@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, Output, ViewChild } from "@angular/core";
 import { NgIf } from "@angular/common";
 import { BrowserMultiFormatReader } from "@zxing/browser";
+import { BarcodeFormat, DecodeHintType } from "@zxing/library";
 
 @Component({
   selector: "app-barcode-scanner",
@@ -23,7 +24,22 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
   @Output() error = new EventEmitter<string>();
 
   errorMessage: string | null = null;
-  private reader = new BrowserMultiFormatReader();
+  private readonly hints = new Map<DecodeHintType, unknown>([
+    [
+      DecodeHintType.POSSIBLE_FORMATS,
+      [
+        BarcodeFormat.EAN_13,
+        BarcodeFormat.EAN_8,
+        BarcodeFormat.UPC_A,
+        BarcodeFormat.UPC_E,
+        BarcodeFormat.CODE_128
+      ]
+    ]
+  ]);
+  private reader = new BrowserMultiFormatReader(this.hints, {
+    delayBetweenScanAttempts: 120,
+    delayBetweenScanSuccess: 250
+  });
   private stream: MediaStream | null = null;
   private active = false;
 
@@ -45,8 +61,9 @@ export class BarcodeScannerComponent implements AfterViewInit, OnDestroy {
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment",
-          width: { ideal: 640 },
-          height: { ideal: 480 }
+          width: { ideal: 480 },
+          height: { ideal: 360 },
+          frameRate: { ideal: 30, max: 60 }
         }
       });
       const videoEl = this.videoRef.nativeElement;

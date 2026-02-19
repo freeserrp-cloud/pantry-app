@@ -1,6 +1,7 @@
 export interface InventoryItem {
   id: string;
   name: string;
+  barcode?: string | null;
   quantity: number;
   min_quantity: number;
   category?: string | null;
@@ -10,6 +11,7 @@ export interface InventoryItem {
 
 export interface InventoryItemCreate {
   name: string;
+  barcode?: string | null;
   quantity: number;
   min_quantity: number;
   category?: string | null;
@@ -17,6 +19,7 @@ export interface InventoryItemCreate {
 
 export interface InventoryItemUpdate {
   name?: string;
+  barcode?: string | null;
   quantity?: number;
   min_quantity?: number;
   category?: string | null;
