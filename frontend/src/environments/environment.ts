@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: "https://192.168.178.46:4200/"
+  production: true,
+  apiUrl: "https://pantry-app-fm9y.onrender.com"
 };
