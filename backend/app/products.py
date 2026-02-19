@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from product_lookup import lookup_product
+from app.product_lookup import lookup_product
 
 router = APIRouter()
 
