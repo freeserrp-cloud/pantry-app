@@ -11,62 +11,67 @@ import { environment } from "../../environments/environment";
   standalone: true,
   imports: [NgIf, NgFor, RouterLink, BarcodeScannerComponent],
   template: `
-    <section class="inventory-header">
-      <div>
-        <h1>Inventory</h1>
-        <p class="hint">Tap + / - to update quickly.</p>
-      </div>
-      <div class="actions">
-        <button class="secondary" (click)="openScanner()">Scan Product</button>
-        <a class="primary" routerLink="/items/new">Add Item</a>
-      </div>
-    </section>
+    <div class="page-bg">
+      <div class="mobile-shell">
+        <header class="hero-header">
+          <h1>Pantry</h1>
+          <p>Deine Lebensmittel</p>
+        </header>
 
-    <section *ngIf="store.error()" class="error">{{ store.error() }}</section>
+        <section class="top-actions">
+          <a class="add-btn" routerLink="/items/new">Add Item</a>
+        </section>
 
-    <section *ngIf="store.loading()" class="loading">Loading...</section>
+        <section *ngIf="store.error()" class="error">{{ store.error() }}</section>
 
-    <section *ngIf="!store.loading() && store.items().length === 0" class="empty">
-      <div class="empty-card">
-        <h2>No items yet</h2>
-        <p>Add your first pantry item to get started.</p>
-        <a class="primary" routerLink="/items/new">Add Item</a>
-      </div>
-    </section>
+        <section *ngIf="store.loading()" class="loading">Loading...</section>
 
-    <section class="inventory-list" *ngIf="store.items().length">
-      <article
-        class="item-card"
-        *ngFor="let item of store.items(); trackBy: trackById"
-        [class.low]="isLow(item.quantity, item.min_quantity)"
-      >
-        <div class="item-main">
-          <div class="item-left">
-            <div class="item-thumb" aria-hidden="true">
-              {{ item.name.charAt(0).toUpperCase() }}
-            </div>
-            <div class="item-details">
-              <div class="item-name">{{ item.name }}</div>
-              <div class="item-meta">
-                <span *ngIf="item.category">{{ item.category }}</span>
-                <span *ngIf="item.min_quantity > 0">Min {{ item.min_quantity }}</span>
+        <section *ngIf="!store.loading() && store.items().length === 0" class="empty">
+          <div class="empty-card">
+            <h2>No items yet</h2>
+            <p>Add your first pantry item to get started.</p>
+            <a class="add-btn" routerLink="/items/new">Add Item</a>
+          </div>
+        </section>
+
+        <section class="inventory-list" *ngIf="store.items().length">
+          <article
+            class="item-card"
+            *ngFor="let item of store.items(); trackBy: trackById"
+            [class.low]="isLow(item.quantity, item.min_quantity)"
+          >
+            <div class="item-main">
+              <div class="item-left">
+                <div class="item-thumb" aria-hidden="true">
+                  {{ item.name.charAt(0).toUpperCase() }}
+                </div>
+                <div class="item-details">
+                  <div class="item-name">{{ item.name }}</div>
+                  <div class="item-meta">
+                    <span *ngIf="item.category">{{ item.category }}</span>
+                    <span *ngIf="item.min_quantity > 0">Min {{ item.min_quantity }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="quantity" [attr.aria-label]="'Quantity ' + item.quantity">
+                {{ item.quantity }}
               </div>
             </div>
-          </div>
-          <div class="quantity" [attr.aria-label]="'Quantity ' + item.quantity">
-            {{ item.quantity }}
-          </div>
-        </div>
-        <div class="item-actions">
-          <button class="qty-btn" (click)="store.decrement(item.id)" aria-label="Decrease quantity">-</button>
-          <button class="qty-btn" (click)="store.increment(item.id)" aria-label="Increase quantity">+</button>
-        </div>
-        <div class="item-links">
-          <a routerLink="/items/{{ item.id }}">Edit</a>
-          <button class="ghost" (click)="store.deleteItem(item.id)">Delete</button>
-        </div>
-      </article>
-    </section>
+            <div class="item-actions">
+              <button class="qty-btn" (click)="store.decrement(item.id)" aria-label="Decrease quantity">-</button>
+              <button class="qty-btn" (click)="store.increment(item.id)" aria-label="Increase quantity">+</button>
+            </div>
+            <div class="item-links">
+              <a routerLink="/items/{{ item.id }}">Edit</a>
+              <button class="ghost" (click)="store.deleteItem(item.id)">Delete</button>
+            </div>
+          </article>
+        </section>
+      </div>
+      <button class="floating-scan-btn" (click)="openScanner()" aria-label="Scan Product">
+        Scan
+      </button>
+    </div>
 
     <div class="scanner-overlay" *ngIf="showScanner()">
       <div class="scanner-modal">
