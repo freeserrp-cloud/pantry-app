@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  background: #f5f5f7;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  background: linear-gradient(180deg, #f9fafb 0%, #f1f5f9 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
   margin: 0;
 }

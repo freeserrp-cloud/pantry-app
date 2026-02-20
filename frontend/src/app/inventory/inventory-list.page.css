@@ -3,44 +3,125 @@
 }
 
 .page-bg {
-  padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  min-height: 100%;
+  padding: 20px 14px calc(108px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #f9fafb 0%, #f1f5f9 100%);
 }
 
 .mobile-shell {
+  max-width: 420px;
+  margin: 0 auto;
   padding-top: calc(8px + env(safe-area-inset-top));
+}
+
+.hero-header {
+  margin-bottom: 26px;
 }
 
 .hero-header h1 {
   margin: 0;
+  color: #000;
+  font-size: clamp(2rem, 7.4vw, 2.35rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 700;
 }
 
 .hero-header p {
-  margin: 4px 0 0;
+  margin: 7px 0 0;
+  color: #6e6e73;
+  font-size: 0.94rem;
+  font-weight: 500;
 }
 
-.top-actions .add-btn {
-  display: inline-flex;
+.top-actions {
+  margin-bottom: 24px;
+}
+
+.add-btn {
   width: 100%;
+  min-height: 52px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #0a84ff, #4da3ff);
+  box-shadow: 0 10px 22px rgba(10, 132, 255, 0.28);
+  font-size: 0.95rem;
+  font-weight: 700;
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.add-btn:active {
+  transform: scale(0.97);
+}
+
+.loading,
+.error {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+}
+
+.loading {
+  color: #6e6e73;
+}
+
+.error {
+  color: #b42318;
+}
+
+.empty {
+  margin-bottom: 18px;
+}
+
+.empty-card {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  padding: 22px;
+  text-align: center;
+}
+
+.empty-card h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.empty-card p {
+  margin: 8px 0 18px;
+  color: #6e6e73;
+  font-size: 0.9rem;
 }
 
 .inventory-list {
-  margin: 0;
+  display: grid;
+  gap: 14px;
 }
 
 .item-card {
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  background: #ffffff;
-  display: block;
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  display: grid;
+  gap: 14px;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.item-card.low {
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(10, 132, 255, 0.2);
 }
 
 .item-main {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
 }
 
 .item-left {
@@ -53,9 +134,9 @@
 .item-thumb {
   width: 44px;
   height: 44px;
-  border-radius: 14px;
-  background: #ebeff5;
-  color: #334155;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #edf2fb 0%, #e6ecf7 100%);
+  color: #344256;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
@@ -68,56 +149,62 @@
 }
 
 .item-name {
+  color: #000;
+  font-size: 1.02rem;
+  line-height: 1.2;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .item-meta {
-  margin-top: 4px;
+  margin-top: 5px;
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
 }
 
 .item-meta span {
-  font-size: 0.72rem;
-  color: #6b7280;
-  background: #f3f4f6;
+  font-size: 0.73rem;
+  color: #6e6e73;
+  background: #f2f2f7;
   border-radius: 999px;
   padding: 2px 8px;
 }
 
 .quantity {
-  min-width: 52px;
+  min-width: 54px;
   height: 34px;
-  border-radius: 12px;
-  background: #f3f4f6;
-  color: #1f2937;
-  font-size: 0.95rem;
+  border-radius: 999px;
+  background: #f2f2f7;
+  color: #1d1d1f;
+  font-size: 0.94rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0 10px;
 }
 
 .item-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-bottom: 10px;
 }
 
 .qty-btn {
   min-height: 44px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(180deg, #2f2f32 0%, #1c1c1e 100%);
-  color: #ffffff;
-  font-size: 1.1rem;
+  background: linear-gradient(180deg, #303035 0%, #1c1c1e 100%);
+  color: #fff;
+  font-size: 1.14rem;
   font-weight: 600;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transition: transform 150ms ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  transition: transform 160ms ease, filter 160ms ease;
 }
 
 .qty-btn:active {
@@ -132,7 +219,7 @@
 }
 
 .item-links a {
-  color: #1f2937;
+  color: #1d1d1f;
   text-decoration: none;
   font-weight: 600;
 }
@@ -140,27 +227,29 @@
 .item-links .ghost {
   border: none;
   background: transparent;
-  color: #6e6e73;
+  color: #ff3b30;
   font-weight: 600;
-}
-
-.item-card.low {
-  outline: 1px solid rgba(0, 122, 255, 0.24);
-}
-
-.empty-card {
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 .floating-scan-btn {
   position: fixed;
-  right: 20px;
-  bottom: calc(20px + env(safe-area-inset-bottom));
-  width: 68px;
-  height: 68px;
+  right: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  width: 70px;
+  height: 70px;
   border: none;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, #0a84ff, #4da3ff);
+  box-shadow: 0 16px 30px rgba(10, 132, 255, 0.35);
+  font-size: 0.9rem;
+  font-weight: 700;
   z-index: 50;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.floating-scan-btn:active {
+  transform: scale(0.97);
 }
 
 .scanner-overlay {
@@ -178,7 +267,7 @@
   position: relative;
   width: min(100vw - 24px, 520px);
   height: min(100vh - 24px, 760px);
-  border-radius: 24px;
+  border-radius: 26px;
   overflow: hidden;
   background: #000;
   box-shadow: 0 24px 46px rgba(0, 0, 0, 0.28);
@@ -201,7 +290,7 @@
   background: rgba(255, 255, 255, 0.14);
   color: #fff;
   font-weight: 600;
-  transition: transform 150ms ease;
+  transition: transform 160ms ease;
 }
 
 .scanner-cancel:active {
@@ -260,7 +349,7 @@
   color: #111;
   font-size: 0.9rem;
   font-weight: 700;
-  transition: transform 150ms ease;
+  transition: transform 160ms ease;
 }
 
 .scanner-fallback-btn:active {
@@ -293,7 +382,7 @@
 @media (hover: hover) and (pointer: fine) {
   .item-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.07);
   }
 }
 
