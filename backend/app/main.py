@@ -5,9 +5,11 @@ from sqlalchemy import inspect, text
 from app.core.config import get_settings
 from app.core.database import engine
 from app.models.inventory_item import Base
+import app.models.shopping_list_item  # noqa: F401
 from app.routers.health import router as health_router
 from app.routers.inventory import router as inventory_router
 from app.routers.products import router as products_router
+from app.routers.shopping_list import router as shopping_list_router
 
 
 settings = get_settings()
@@ -26,6 +28,7 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(inventory_router)
 app.include_router(products_router, prefix="/products", tags=["products"])
+app.include_router(shopping_list_router)
 
 
 @app.on_event("startup")

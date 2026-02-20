@@ -1,0 +1,125 @@
+.shopping-page {
+  display: grid;
+  gap: 14px;
+  padding: 0 6px 20px;
+}
+
+.card {
+  border-radius: 24px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  color: #fff;
+}
+
+h2,
+h3 {
+  margin: 0 0 6px;
+}
+
+p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.add-form {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 8px;
+}
+
+input,
+textarea,
+button {
+  border: none;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+}
+
+input,
+textarea {
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f1f2e;
+}
+
+button {
+  background: linear-gradient(135deg, #ff8fb1, #ffb3c6);
+  color: #fff;
+  font-weight: 700;
+}
+
+button.ghost {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+button.full {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.hint {
+  margin-top: 8px;
+  font-size: 0.82rem;
+}
+
+.loading,
+.error {
+  font-size: 0.9rem;
+  padding: 0 2px;
+}
+
+.error {
+  color: #ffd9d6;
+}
+
+.list-item {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.inv-flag {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: #ffd7d3;
+}
+
+.inv-flag.available {
+  color: #cbffd8;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.completed {
+  opacity: 0.72;
+}
+
+@media (max-width: 560px) {
+  .add-form {
+    grid-template-columns: 1fr 84px;
+  }
+
+  .add-form button {
+    grid-column: span 2;
+  }
+}

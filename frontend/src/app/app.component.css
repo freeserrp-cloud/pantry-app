@@ -23,6 +23,23 @@
   box-shadow: 0 16px 40px rgba(16, 8, 40, 0.22);
 }
 
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-btn {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
 .title {
   color: #ffffff;
   font-weight: 700;
@@ -41,4 +58,40 @@
 .app-main {
   flex: 1;
   padding: 0 0 20px;
+}
+
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 6, 24, 0.44);
+  z-index: 70;
+}
+
+.menu-drawer {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 10px);
+  left: 10px;
+  width: min(300px, calc(100vw - 20px));
+  border-radius: 22px;
+  padding: 10px;
+  background: rgba(36, 23, 74, 0.96);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.3);
+  z-index: 80;
+}
+
+.menu-drawer nav {
+  display: grid;
+  gap: 6px;
+}
+
+.menu-drawer a {
+  display: block;
+  border-radius: 14px;
+  padding: 10px 12px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.menu-drawer a.active {
+  background: rgba(255, 255, 255, 0.18);
 }
