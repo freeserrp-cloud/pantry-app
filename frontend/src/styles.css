@@ -1,54 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
-
-:root {
-  --bg: #f2f2f7;
-  --card: #ffffff;
-  --text-primary: #111111;
-  --text-secondary: #8e8e93;
-  --accent: #34c759;
-  --accent-dark: #2eab4d;
-  --line-soft: #e9eaed;
-  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
-  --radius-card: 20px;
-  --radius-button: 12px;
-  --radius-floating: 24px;
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-4: 32px;
-}
-
-* {
-  box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body {
+  background: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
   margin: 0;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", sans-serif;
-  background: linear-gradient(180deg, #f7f8fb 0%, #edf1f7 100%);
-  color: var(--text-primary);
-  line-height: 1.45;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  min-height: 100vh;
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
-
-a {
-  color: inherit;
-}
-
-input,
-textarea,
-button {
-  font: inherit;
-}
-
-button,
-a {
-  transition: all 180ms ease;
 }

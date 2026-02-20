@@ -6,14 +6,16 @@ import { RouterOutlet } from "@angular/router";
   standalone: true,
   imports: [RouterOutlet],
   template: `
-    <div class="app-shell">
-      <header class="app-header">
-        <div class="title">Pantry</div>
-        <div class="subtitle">Fast, simple household inventory</div>
-      </header>
-      <main class="app-main">
-        <router-outlet />
-      </main>
+    <div class="min-h-screen bg-iosBg text-iosText px-4 py-6">
+      <div class="app-shell">
+        <header class="app-header">
+          <div class="title">Pantry</div>
+          <div class="subtitle">Fast, simple household inventory</div>
+        </header>
+        <main class="app-main">
+          <router-outlet />
+        </main>
+      </div>
     </div>
   `,
   styleUrls: ["./app.component.css"]

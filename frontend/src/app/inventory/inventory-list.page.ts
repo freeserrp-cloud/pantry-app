@@ -11,42 +11,42 @@ import { environment } from "../../environments/environment";
   standalone: true,
   imports: [NgIf, NgFor, RouterLink, BarcodeScannerComponent],
   template: `
-    <div class="page-bg">
-      <div class="mobile-shell">
-        <header class="hero-header">
-          <h1>Pantry</h1>
-          <p>Deine Lebensmittel</p>
+    <div class="page-bg min-h-screen bg-iosBg">
+      <div class="mobile-shell max-w-[480px] mx-auto px-2 pb-24">
+        <header class="hero-header mb-4">
+          <h1 class="text-xl font-semibold tracking-tight">Pantry</h1>
+          <p class="text-sm text-gray-500">Deine Lebensmittel</p>
         </header>
 
-        <section class="top-actions">
-          <a class="add-btn" routerLink="/items/new">Add Item</a>
+        <section class="top-actions mb-6">
+          <a class="add-btn bg-iosBlue text-white rounded-xl px-4 py-3 font-semibold shadow-ios active:scale-95 transition" routerLink="/items/new">Add Item</a>
         </section>
 
-        <section *ngIf="store.error()" class="error">{{ store.error() }}</section>
+        <section *ngIf="store.error()" class="error text-sm text-red-600 mb-4">{{ store.error() }}</section>
 
-        <section *ngIf="store.loading()" class="loading">Loading...</section>
+        <section *ngIf="store.loading()" class="loading text-sm text-gray-500 mb-4">Loading...</section>
 
         <section *ngIf="!store.loading() && store.items().length === 0" class="empty">
-          <div class="empty-card">
-            <h2>No items yet</h2>
-            <p>Add your first pantry item to get started.</p>
-            <a class="add-btn" routerLink="/items/new">Add Item</a>
+          <div class="empty-card bg-white rounded-2xl shadow-soft p-5 mb-3">
+            <h2 class="text-xl font-semibold tracking-tight">No items yet</h2>
+            <p class="text-sm text-gray-500 mb-4">Add your first pantry item to get started.</p>
+            <a class="add-btn bg-iosBlue text-white rounded-xl px-4 py-3 font-semibold shadow-ios active:scale-95 transition" routerLink="/items/new">Add Item</a>
           </div>
         </section>
 
-        <section class="inventory-list" *ngIf="store.items().length">
+        <section class="inventory-list space-y-3" *ngIf="store.items().length">
           <article
-            class="item-card"
+            class="item-card bg-white rounded-2xl shadow-soft p-4 mb-3 flex items-center gap-4 transition active:scale-[0.98]"
             *ngFor="let item of store.items(); trackBy: trackById"
             [class.low]="isLow(item.quantity, item.min_quantity)"
           >
-            <div class="item-main">
+            <div class="item-main w-full">
               <div class="item-left">
                 <div class="item-thumb" aria-hidden="true">
                   {{ item.name.charAt(0).toUpperCase() }}
                 </div>
                 <div class="item-details">
-                  <div class="item-name">{{ item.name }}</div>
+                  <div class="item-name text-base font-semibold tracking-tight">{{ item.name }}</div>
                   <div class="item-meta">
                     <span *ngIf="item.category">{{ item.category }}</span>
                     <span *ngIf="item.min_quantity > 0">Min {{ item.min_quantity }}</span>
@@ -68,17 +68,19 @@ import { environment } from "../../environments/environment";
           </article>
         </section>
       </div>
-      <button class="floating-scan-btn" (click)="openScanner()" aria-label="Scan Product">
+      <button class="floating-scan-btn bg-iosBlue text-white rounded-full shadow-ios active:scale-95 transition" (click)="openScanner()" aria-label="Scan Product">
         Scan
       </button>
     </div>
 
     <div class="scanner-overlay" *ngIf="showScanner()">
       <div class="scanner-modal">
-        <app-barcode-scanner
-          (detected)="onDetected($event)"
-          (error)="onScannerError($event)"
-        />
+        <div class="bg-black rounded-3xl overflow-hidden shadow-ios scanner-wrap">
+          <app-barcode-scanner
+            (detected)="onDetected($event)"
+            (error)="onScannerError($event)"
+          />
+        </div>
         <div class="scanner-error-banner" *ngIf="scannerError()">
           {{ scannerError() }}
         </div>
