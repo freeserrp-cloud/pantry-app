@@ -89,6 +89,12 @@ button.full {
   gap: 8px;
 }
 
+.edit-row {
+  display: grid;
+  grid-template-columns: 1fr 90px auto auto;
+  gap: 8px;
+}
+
 .qty {
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.72);
@@ -120,6 +126,14 @@ button.full {
   }
 
   .add-form button {
+    grid-column: span 2;
+  }
+
+  .edit-row {
+    grid-template-columns: 1fr 84px;
+  }
+
+  .edit-row button {
     grid-column: span 2;
   }
 }

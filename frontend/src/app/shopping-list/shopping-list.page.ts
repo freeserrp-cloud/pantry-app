@@ -1,9 +1,10 @@
-import { Component, OnInit, computed, inject, signal } from "@angular/core";
+import { Component, OnInit, computed, inject } from "@angular/core";
 import { NgFor, NgIf } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 
 import { InventoryStore } from "../inventory/inventory.store";
 import { ShoppingListStore } from "./shopping-list.store";
+import { ShoppingListItem } from "./shopping-list.models";
 
 @Component({
   selector: "app-shopping-list",
@@ -56,7 +57,7 @@ import { ShoppingListStore } from "./shopping-list.store";
         <h3>Offen</h3>
         <article class="list-item" *ngFor="let item of store.openItems(); trackBy: trackById">
           <div>
-            <div class="name-row">
+            <div class="name-row" *ngIf="editingId !== item.id; else editRow">
               <strong>{{ item.name }}</strong>
               <span class="qty">x{{ item.quantity }}</span>
             </div>
@@ -65,11 +66,21 @@ import { ShoppingListStore } from "./shopping-list.store";
             </div>
           </div>
           <div class="actions">
-            <button (click)="changeQty(item.id, item.quantity - 1)" [disabled]="item.quantity <= 1">-</button>
-            <button (click)="changeQty(item.id, item.quantity + 1)">+</button>
-            <button (click)="markDone(item.id)">Erledigt</button>
-            <button class="ghost" (click)="store.deleteItem(item.id)">Löschen</button>
+            <button type="button" (click)="changeQty(item.id, item.quantity - 1)" [disabled]="item.quantity <= 1">-</button>
+            <button type="button" (click)="changeQty(item.id, item.quantity + 1)">+</button>
+            <button type="button" (click)="markDone(item.id)">Erledigt</button>
+            <button type="button" (click)="startEdit(item)">Bearbeiten</button>
+            <button type="button" class="ghost" (click)="deleteItem(item.id)">Löschen</button>
           </div>
+
+          <ng-template #editRow>
+            <div class="edit-row">
+              <input type="text" [(ngModel)]="editName" [ngModelOptions]="{ standalone: true }" />
+              <input type="number" min="1" [(ngModel)]="editQuantity" [ngModelOptions]="{ standalone: true }" />
+              <button type="button" (click)="saveEdit(item.id)">Speichern</button>
+              <button type="button" class="ghost" (click)="cancelEdit()">Abbrechen</button>
+            </div>
+          </ng-template>
         </article>
       </section>
 
@@ -87,8 +98,8 @@ import { ShoppingListStore } from "./shopping-list.store";
             <span class="qty">x{{ item.quantity }}</span>
           </div>
           <div class="actions">
-            <button (click)="markOpen(item.id)">Wieder offen</button>
-            <button class="ghost" (click)="store.deleteItem(item.id)">Löschen</button>
+            <button type="button" (click)="markOpen(item.id)">Wieder offen</button>
+            <button type="button" class="ghost" (click)="deleteItem(item.id)">Löschen</button>
           </div>
         </article>
       </section>
@@ -103,6 +114,9 @@ export class ShoppingListPage implements OnInit {
   manualName = "";
   manualQuantity = 1;
   alexaUtterance = "";
+  editingId: string | null = null;
+  editName = "";
+  editQuantity = 1;
 
   private normalizedInventoryNames = computed(() =>
     this.inventoryStore
@@ -155,6 +169,34 @@ export class ShoppingListPage implements OnInit {
 
   markOpen(id: string) {
     this.store.updateItem(id, { completed: false });
+  }
+
+  startEdit(item: ShoppingListItem) {
+    this.editingId = item.id;
+    this.editName = item.name;
+    this.editQuantity = item.quantity;
+  }
+
+  cancelEdit() {
+    this.editingId = null;
+    this.editName = "";
+    this.editQuantity = 1;
+  }
+
+  saveEdit(id: string) {
+    const nextName = this.editName.trim();
+    if (!nextName) {
+      return;
+    }
+    this.store.updateItem(id, {
+      name: nextName,
+      quantity: Math.max(1, Number(this.editQuantity || 1))
+    });
+    this.cancelEdit();
+  }
+
+  deleteItem(id: string) {
+    this.store.deleteItem(id);
   }
 
   isInInventory(name: string) {

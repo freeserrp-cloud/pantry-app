@@ -35,9 +35,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
         <a routerLink="/shopping-list" routerLinkActive="active" (click)="closeMenu()">
           Einkaufsliste
         </a>
-        <a routerLink="/items/new" routerLinkActive="active" (click)="closeMenu()">
-          Produkt anlegen
-        </a>
       </nav>
     </aside>
   `,
