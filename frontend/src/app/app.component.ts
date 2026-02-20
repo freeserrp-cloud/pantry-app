@@ -6,7 +6,7 @@ import { RouterOutlet } from "@angular/router";
   standalone: true,
   imports: [RouterOutlet],
   template: `
-    <div class="min-h-screen bg-iosBg text-iosText px-4 py-6">
+    <div class="min-h-screen app-root-shell px-4 py-6">
       <div class="app-shell">
         <header class="app-header">
           <div class="title">Pantry</div>
